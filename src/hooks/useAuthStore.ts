@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 interface User {
-  id: string;
+  id: number;
   firebaseUid: string;
   username: string;
   profileImage: string | null;
   name: string | null;
   authToken: string | null;
-
+  twitterHandle: string | null;
 }
 
 interface Wallet {

@@ -9,22 +9,59 @@ import MyNFT from "@/pages/MyNFT";
 import Explore from "@/pages/Explore";
 import Navbar from "@/components/Navbar";
 import ScrollToTop from "@/components/ScrollToTop";
+import ProfileSidebar from "@/components/ProfileSidebar";
 import { SolanaProvider } from "./providers/Solana";
+import { useSidebar } from "@/hooks/useSidebar";
+import { useEffect } from "react";
+import { dummyProfileData, getRandomProfile } from "@/data/dummyProfileData";
 import { Buffer } from 'buffer';
 
    if (typeof window !== 'undefined') {
      window.Buffer = Buffer;
    }
 function Router() {
+  const { setMobile } = useSidebar();
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [setMobile]);
+
+  // Using dummy profile data - replace with actual user data from your auth/state management
+  const mockUser = dummyProfileData;
+
+  const handleFollow = () => {
+    console.log("Following user...");
+    // Implement follow logic
+  };
+
+  const handleUnfollow = () => {
+    console.log("Unfollowing user...");
+    // Implement unfollow logic
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/my-nfts" component={MyNFT} />
-        <Route path="/explore" component={Explore} />
-        <Route component={NotFound} />
-      </Switch>
+      <ProfileSidebar
+        user={mockUser}
+        onFollow={handleFollow}
+        onUnfollow={handleUnfollow}
+      />
+      <div className="lg:ml-80 pt-16 px-4 lg:px-8">
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/my-nfts" component={MyNFT} />
+          <Route path="/explore" component={Explore} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
       <ScrollToTop />
     </div>
   );

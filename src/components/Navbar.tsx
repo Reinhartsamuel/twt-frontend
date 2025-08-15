@@ -1,5 +1,6 @@
 import { useLocation, Link } from "wouter";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useSidebar } from "@/hooks/useSidebar";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo";
 import { useEffect, useState } from "react";
@@ -30,7 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { LogOut, Copy, X, ExternalLink, Menu } from "lucide-react";
+import { LogOut, Copy, X, ExternalLink, Menu, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
@@ -38,7 +39,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { auth } from "@/configs/firebase";
-import { OAuthCredential, signInWithPopup, TwitterAuthProvider } from "firebase/auth";
+import { OAuthCredential, signInWithPopup, TwitterAuthProvider, UserCredential } from "firebase/auth";
 import { provider } from "@/providers/Twitter";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui"
@@ -53,6 +54,7 @@ export default function Navbar() {
   const [showWalletDetails, setShowWalletDetails] = useState(false);
   const [location] = useLocation();
   const { isAuthenticated, user, wallet, logout, login } = useAuthStore();
+  const { toggleSidebar } = useSidebar();
   const { toast } = useToast();
   const { connect, connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
@@ -84,8 +86,6 @@ export default function Navbar() {
         })
       });
       const { user: userDb, wallet } = await res.json();
-      console.log(userDb, 'userDb')
-      console.log(wallet, 'wallet')
       login({
         user:userDb,
         wallet
@@ -128,24 +128,35 @@ export default function Navbar() {
     setSheetOpen(false);
   };
 
+  // Debug logging
+  console.log('Current location:', location);
+
   return (
-    <nav className="px-4 py-3 md:px-8 flex justify-between items-center border-b border-gray-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-3 md:px-8 flex justify-between items-center border-b border-gray-800 bg-black/90 backdrop-blur-sm">
       <div className="flex items-center">
+        {/* Mobile Profile Sidebar Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden mr-3 text-white hover:bg-gray-800"
+          onClick={toggleSidebar}
+        >
+          <User className="h-5 w-5" />
+          <span className="sr-only">Toggle profile sidebar</span>
+        </Button>
+
         <Link href="/" className="flex items-center" aria-label="Tweetonium Home">
           <Logo size="sm" />
         </Link>
 
         {/* Desktop Navigation */}
         <div className="ml-8 space-x-6 hidden md:flex">
-          <Link href="/explore" className={`hover:text-gray-300 transition-colors ${location === "/explore" ? "font-medium" : ""}`}>
+          <Link href="/explore" className={`hover:text-gray-300 transition-colors ${location.startsWith("/explore") ? "font-bold text-purple-400 border-b border-purple-400" : "text-gray-300"}`}>
             Explore
           </Link>
-
-          {isAuthenticated && (
-            <Link href="/my-nfts" className={`hover:text-gray-300 transition-colors ${location === "/my-nfts" ? "font-medium" : ""}`}>
-              My NFTs
-            </Link>
-          )}
+          <Link href="/my-nfts" className={`hover:text-gray-300 transition-colors ${location.startsWith("/my-nfts") ? "font-bold text-purple-400 border-b border-purple-400" : "text-gray-300"}`}>
+            My NFTs
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -167,20 +178,18 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/explore"
-                className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location === "/explore" ? "bg-gray-900 font-medium" : ""}`}
+                className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location.startsWith("/explore") ? "bg-purple-900 text-purple-300 font-bold" : ""}`}
                 onClick={closeSheet}
               >
                 Explore
               </Link>
-              {isAuthenticated && (
-                <Link
-                  href="/my-nfts"
-                  className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location === "/my-nfts" ? "bg-gray-900 font-medium" : ""}`}
-                  onClick={closeSheet}
-                >
-                  My NFTs
-                </Link>
-              )}
+              <Link
+                href="/my-nfts"
+                className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location.startsWith("/my-nfts") ? "bg-purple-900 text-purple-300 font-bold" : ""}`}
+                onClick={closeSheet}
+              >
+                My NFTs
+              </Link>
             </nav>
           </SheetContent>
         </Sheet>
@@ -310,6 +319,10 @@ function WalletDialogue({
   showWalletDetails,
   setShowWalletDetails,
   wallet
+}:{
+  showWalletDetails: boolean;
+  setShowWalletDetails: (value: boolean) => void;
+  wallet: any;
 }) {
   const { toast } = useToast();
   const [balance, setBalance] = useState(0);

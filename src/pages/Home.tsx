@@ -27,7 +27,6 @@ export default function Home() {
     },
     enabled: true,
   });
-  console
 
   const { data: newNfts, isLoading: newLoading } = useQuery<NFT[]>({
     queryKey: [`${BASE_URL}/api/explore?tab=new`],

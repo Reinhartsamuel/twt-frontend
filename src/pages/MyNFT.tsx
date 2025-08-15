@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import NFTCard from "@/components/NFTCard";
+import NFTCard, { NFT } from "@/components/NFTCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import MintNFTModal from "@/components/MintNFTModal";
+import { BASE_URL } from "@/constants/baseUrl";
+import { useAuthStore } from "@/hooks/useAuthStore";
 
 export default function MyNFT() {
   const [mintOpen, setMintOpen] = useState(false);
+  const { user } = useAuthStore();
   const { data: nfts, isLoading } = useQuery({
-    queryKey: ["/api/my-nfts"],
+    queryKey: [`${BASE_URL}/api/nfts?initialOwnerUserId=99`],
+    queryFn: async () => {
+      const response = await fetch(`${BASE_URL}/api/nfts?initialOwnerUserId=${user?.id}`);
+      const data = await response.json();
+      return data.data;
+    },
   });
+
 
   const handlePostToX = () => {
     const postText = encodeURIComponent("Title:\nDesc:\n@tweetonium_xyz");
@@ -20,7 +29,7 @@ export default function MyNFT() {
   return (
     <main className="flex-grow">
       <div className="py-8 px-4 md:px-8">
-        <h2 className="text-3xl mb-8 tiny5-font cursor-pointer" onClick={() =>{}}>MY NFTSx</h2>
+        <h2 className="text-3xl mb-8 tiny5-font cursor-pointer" onClick={() =>{}}>MY NFTS</h2>
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

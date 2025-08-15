@@ -59,7 +59,7 @@ export default function Explore() {
           <h2 className="text-3xl tiny5-font">EXPLORE</h2>
           <Button
             variant="outline"
-            size="sm"
+            size=""
             className="text-white border-gray-700 hover:bg-gray-800"
             onClick={handleRefresh}
             disabled={isRefreshing}
