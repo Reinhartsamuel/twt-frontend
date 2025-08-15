@@ -10,7 +10,11 @@ import Explore from "@/pages/Explore";
 import Navbar from "@/components/Navbar";
 import ScrollToTop from "@/components/ScrollToTop";
 import { SolanaProvider } from "./providers/Solana";
+import { Buffer } from 'buffer';
 
+   if (typeof window !== 'undefined') {
+     window.Buffer = Buffer;
+   }
 function Router() {
   return (
     <div className="min-h-screen bg-black text-white">
