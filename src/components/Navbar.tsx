@@ -43,6 +43,8 @@ import { provider } from "@/providers/Twitter";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui"
 import PhantomLogo from "@/assets/Phantom-Icon_App_60x60.png";
+import { BASE_URL } from "@/constants/baseUrl";
+
 
 
 export default function Navbar() {
@@ -72,7 +74,7 @@ export default function Navbar() {
       console.log(twitterUsername, ':::twitter username',);
       console.log(user, ':::user')
       // Send the token and secret to your backend for verification
-      const res = await fetch('http://localhost:4000/api/auth/login', {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         body: JSON.stringify({
           "twitterHandle": twitterUsername,
@@ -328,7 +330,7 @@ function WalletDialogue({
   };
   async function getBalance() {
     if (wallet?.publicKey) {
-      const res = await fetch(`localhost:4000/api/wallet/balance/${wallet.publicKey}`);
+      const res = await fetch(`${BASE_URL}/api/wallet/balance/${wallet.publicKey}`);
       const { data } = await res.json();
       const resultBalance = data.balance;
       setBalance(resultBalance || 0);

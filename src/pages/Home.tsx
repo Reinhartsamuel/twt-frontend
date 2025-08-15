@@ -5,9 +5,7 @@ import Logo from "@/components/Logo";
 import MintNFTModal from "@/components/MintNFTModal";
 import NFTCard, { NFT } from "@/components/NFTCard";
 import { useQuery } from "@tanstack/react-query";
-
-// In production, move this to a config file
-const API_BASE_URL = "http://localhost:4000";
+import { BASE_URL } from "@/constants/baseUrl";
 
 export default function Home() {
   const [connectOpen, setConnectOpen] = useState(false);
@@ -20,9 +18,9 @@ export default function Home() {
   };
 
   const { data: featuredNfts, isLoading: featuredLoading } = useQuery<NFT[]>({
-    queryKey: [`${API_BASE_URL}/api/explore?tab=new`],
+    queryKey: [`${BASE_URL}/api/explore?tab=new`],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/explore?tab=featured`);
+      const response = await fetch(`${BASE_URL}/api/explore?tab=featured`);
       if (!response.ok) throw new Error('Network response was not ok');
       const { data } = await response.json(); // First destructuring here
       return data; // Now returning just the array
@@ -32,9 +30,9 @@ export default function Home() {
   console
 
   const { data: newNfts, isLoading: newLoading } = useQuery<NFT[]>({
-    queryKey: [`${API_BASE_URL}/api/explore?tab=new`],
+    queryKey: [`${BASE_URL}/api/explore?tab=new`],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/explore?tab=new`);
+      const response = await fetch(`${BASE_URL}/api/explore?tab=new`);
       if (!response.ok) throw new Error('Network response was not ok');
       const { data } = await response.json(); // First destructuring here
       return data; // Now returning just the array
@@ -89,7 +87,7 @@ export default function Home() {
         <section className="py-8 px-4 md:px-8">
           <h3 className="text-2xl mb-6 font-medium tiny5-font">NEW NFTS</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {newNfts.map((nft) => (
+            {newNfts?.map((nft) => (
               <NFTCard key={nft.id} nft={nft} />
             ))}
           </div>

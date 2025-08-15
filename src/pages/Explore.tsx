@@ -7,6 +7,7 @@ import NFTCard, { NFT } from "@/components/NFTCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
+import { BASE_URL } from "@/constants/baseUrl";
 
 export default function Explore() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,13 +16,12 @@ export default function Explore() {
   const [activeTab, setActiveTab] = useState<"featured" | "new">("new");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
-  const API_BASE_URL = "http://localhost:4000";
 
 
   const { data: nfts, isLoading } = useQuery<NFT[]>({
-    queryKey: [`${API_BASE_URL}/api/explore?tab=${activeTab}`],
+    queryKey: [`${BASE_URL}/api/explore?tab=${activeTab}`],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/api/explore?tab=${activeTab}`);
+      const response = await fetch(`${BASE_URL}/api/explore?tab=${activeTab}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const { data } = await response.json(); // First destructuring here
       return data; // Now returning just the array
