@@ -15,6 +15,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { useEffect } from "react";
 import { dummyProfileData, getRandomProfile } from "@/data/dummyProfileData";
 import { Buffer } from 'buffer';
+import Creators from "./pages/Creators";
 
    if (typeof window !== 'undefined') {
      window.Buffer = Buffer;
@@ -53,12 +54,13 @@ function Router() {
         user={mockUser}
         onFollow={handleFollow}
         onUnfollow={handleUnfollow}
-      />
+      />  
       <div className="lg:ml-80 pt-16 px-4 lg:px-8">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/my-nfts" component={MyNFT} />
           <Route path="/explore" component={Explore} />
+          <Route path="/creators" component={Creators} />
           <Route component={NotFound} />
         </Switch>
       </div>
