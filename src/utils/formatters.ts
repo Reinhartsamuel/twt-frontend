@@ -5,7 +5,8 @@
 /**
  * Format large numbers with appropriate suffixes (K, M, B)
  */
-export const formatNumber = (num: number): string => {
+export const formatNumber = (num: number | undefined): string => {
+  if (num === undefined) return '';
   if (num >= 1000000000) {
     return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
   }
@@ -106,11 +107,11 @@ export const formatWalletAddress = (address: string, startChars: number = 6, end
  */
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B';
-  
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 

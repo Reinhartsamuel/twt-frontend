@@ -4,7 +4,7 @@ interface User {
   id: number;
   firebaseUid: string;
   username: string;
-  profileImage: string | null;
+  avatar: string | null;
   name: string | null;
   authToken: string | null;
   twitterHandle: string | null;

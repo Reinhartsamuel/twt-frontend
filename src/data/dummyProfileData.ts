@@ -13,8 +13,8 @@ export interface NFTItem {
 export interface UserProfile {
   id: string;
   avatar: string;
-  username: string;
-  handle: string;
+  name: string;
+  twitterHandle: string;
   isVerified: boolean;
   followersCount: number;
   followingCount: number;
@@ -45,7 +45,7 @@ export const dummyProfileData: UserProfile = {
   id: "user_1",
   avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
   username: "0xwnrft",
-  handle: "0xwnrft",
+  twitterHandle: "0xwnrft",
   isVerified: true,
   followersCount: 3000,
   followingCount: 250,
@@ -79,7 +79,7 @@ export const dummyProfileData: UserProfile = {
         createdAt: "2024-01-15"
       },
       {
-        id: "nft_2", 
+        id: "nft_2",
         title: "Cyber City 2077",
         image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
         price: 3.88,
@@ -91,13 +91,13 @@ export const dummyProfileData: UserProfile = {
       },
       {
         id: "nft_3",
-        title: "Digital Dreamscape", 
+        title: "Digital Dreamscape",
         image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=400&fit=crop",
         price: 1.24,
         currency: "SOL",
         collection: "Dream Sequence",
         isOwned: true,
-        creator: "0xwnrft", 
+        creator: "0xwnrft",
         createdAt: "2024-01-10"
       }
     ],
@@ -288,15 +288,3 @@ export const alternativeProfiles: UserProfile[] = [
     }
   }
 ];
-
-// Function to get a random profile
-export const getRandomProfile = (): UserProfile => {
-  const allProfiles = [dummyProfileData, ...alternativeProfiles];
-  return allProfiles[Math.floor(Math.random() * allProfiles.length)];
-};
-
-// Function to get profile by handle
-export const getProfileByHandle = (handle: string): UserProfile | undefined => {
-  const allProfiles = [dummyProfileData, ...alternativeProfiles];
-  return allProfiles.find(profile => profile.handle === handle);
-};

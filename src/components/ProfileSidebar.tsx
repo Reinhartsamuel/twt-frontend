@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Check, X } from "lucide-react";
+import { Check, X, Pencil } from "lucide-react";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useEffect } from "react";
 import { UserProfile } from "@/data/dummyProfileData";
@@ -15,9 +15,11 @@ interface ProfileSidebarProps {
   user: UserProfile;
   onFollow?: () => void;
   onUnfollow?: () => void;
+  isOwnProfile?: boolean;
+  onEditProfile?: () => void;
 }
 
-export default function ProfileSidebar({ user, onFollow, onUnfollow }: ProfileSidebarProps) {
+export default function ProfileSidebar({ user, onFollow, onUnfollow, isOwnProfile = false, onEditProfile }: ProfileSidebarProps) {
   const { isOpen, isMobile, closeSidebar } = useSidebar();
 
   const handleFollowClick = () => {
@@ -65,9 +67,9 @@ export default function ProfileSidebar({ user, onFollow, onUnfollow }: ProfileSi
           <div className="">
             <p className="text-white text-xl tiny5-font mb-2">Profile</p>
             <Avatar className="w-20 h-20 mb-4 ring-2 ring-purple-500/30 rounded-none">
-              <AvatarImage src={user.avatar} alt={user.username} />
+              <AvatarImage src={user.avatar} alt={user?.twitterHandle} />
               <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xl font-bold rounded-none">
-                {user.username.slice(0, 2).toUpperCase()}
+                {user?.twitterHandle}
               </AvatarFallback>
             </Avatar>
 
@@ -80,73 +82,87 @@ export default function ProfileSidebar({ user, onFollow, onUnfollow }: ProfileSi
                   </div>
                 )}
               </div>
-              <p className="text-white text-3xl tiny5-font">@{user.handle}</p>
+              <p className="text-white text-3xl tiny5-font">{user.twitterHandle}</p>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex max-w-[80%] gap-1">
-            <Button
-              onClick={handleFollowClick}
-              className={`flex-1 ${user.isFollowing
+          <div className={`flex ${isOwnProfile ? 'w-full' : 'max-w-[80%]'} gap-1`}>
+            {isOwnProfile ? (
+              <Button
+                onClick={onEditProfile}
+                className="w-full bg-[#873ED0] hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-200 p-0 text-xs h-8 rounded-lg flex items-center justify-center"
+              >
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Button>
+            ) : (
+              <Button
+                onClick={handleFollowClick}
+                className={`flex-1 ${user.isFollowing
                   ? "bg-gray-700 hover:bg-red-600 text-white"
                   : "bg-[#873ED0] hover:from-purple-700 hover:to-pink-700 text-white"
-                } transition-all duration-200 p-0 text-xs h-8 rounded-lg`}
-            >
-              {user.isFollowing ? (
-                <>
-                  <X className="w-4 h-4 mr-2" />
-                  Unfollow
-                </>
-              ) : (
-                "+ Follow"
-              )}
-            </Button>
+                  } transition-all duration-200 p-0 text-xs h-8 rounded-lg`}
+              >
+                {user.isFollowing ? (
+                  <>
+                    <X className="w-4 h-4 mr-2" />
+                    Unfollow
+                  </>
+                ) : (
+                  "+ Follow"
+                )}
+              </Button>
+            )}
 
-            <Button
-              variant="outline"
-              className="p-0 text-[0.8rem] px-2 tiny5-font h-8 rounded-lg flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
-            >
-              <div className="flex">
-                <GoGift className="text-white " size={'lg'}/>
-                Goodtonium
-              </div>
-            </Button>
+            {!isOwnProfile && (
+              <>
+                <Button
+                  variant="outline"
+                  className="p-0 text-[0.8rem] px-2 tiny5-font h-8 rounded-lg flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                >
+                  <div className="flex">
+                    <GoGift className="text-white " size={'lg'} />
+                    Goodtonium
+                  </div>
+                </Button>
 
-            <Button
-              id="goto-x-profile"
-              variant="outline"
-              className="aspect-square p-0 h-8 rounded-lg border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
-            >
-              <img src={XLogo} alt="X logo" className="h-8 w-8" />
-            </Button>
+                <Button
+                  id="goto-x-profile"
+                  variant="outline"
+                  className="aspect-square p-0 h-8 rounded-lg border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                >
+                  <img src={XLogo} alt="X logo" className="h-8 w-8" />
+                </Button>
+              </>
+            )}
           </div>
 
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2 py-4">
-          <div className="text-center">
-            <div className="text-xl font-bold text-white tiny5-font">{formatNumber(user.followersCount)}+</div>
-            <div className="text-xs text-gray-400 uppercase tracking-wide">Followers</div>
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-2 py-4">
+            <div className="text-center">
+              <div className="text-xl font-bold text-white tiny5-font">{formatNumber(user.followersCount || 0)}</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wide">Followers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl font-bold text-white tiny5-font">{formatNumber(user.followingCount || 0)}</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wide">Following</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl font-bold text-white tiny5-font">{formatNumber(user.nftsCount || 0)}</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wide">NFTs Minted</div>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="text-xl font-bold text-white tiny5-font">{formatNumber(user.followingCount)}+</div>
-            <div className="text-xs text-gray-400 uppercase tracking-wide">Following</div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl font-bold text-white tiny5-font">{formatNumber(user.nftsCount)}+</div>
-            <div className="text-xs text-gray-400 uppercase tracking-wide">NFTs Minted</div>
-          </div>
+
+          {/* Bio */}
+          {user.bio && (
+            <div className="">
+              <p className="text-gray-300 text-xs leading-relaxed">{user.bio}</p>
+            </div>
+          )}
         </div>
-
-        {/* Bio */}
-        {user.bio && (
-          <div className="">
-            <p className="text-gray-300 text-xs leading-relaxed">{user.bio}</p>
-          </div>
-        )}
-      </div>
-    </div >
+      </div >
     </>
   );
 }

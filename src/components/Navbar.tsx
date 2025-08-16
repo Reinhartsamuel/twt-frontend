@@ -59,10 +59,6 @@ export default function Navbar() {
   const { connect, connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
 
-  const handleConnectWallet = () => {
-    setVisible(true);
-  };
-
   const handleSignInWithTwitter = async () => {
     setLoading(true);
     try {
@@ -87,7 +83,7 @@ export default function Navbar() {
       });
       const { user: userDb, wallet } = await res.json();
       login({
-        user:userDb,
+        user: userDb,
         wallet
       });
 
@@ -154,9 +150,14 @@ export default function Navbar() {
           <Link href="/explore" className={`hover:text-gray-300 transition-colors ${location.startsWith("/explore") ? "font-bold text-purple-400 border-b border-purple-400" : "text-gray-300"}`}>
             Explore
           </Link>
-          <Link href="/my-nfts" className={`hover:text-gray-300 transition-colors ${location.startsWith("/my-nfts") ? "font-bold text-purple-400 border-b border-purple-400" : "text-gray-300"}`}>
-            My NFTs
-          </Link>
+          {auth.currentUser ?
+            <Link href="/my-nfts" className={`hover:text-gray-300 transition-colors ${location.startsWith("/my-nfts") ? "font-bold text-purple-400 border-b border-purple-400" : "text-gray-300"}`}>
+              My NFTs
+            </Link> : <></>
+          }
+          {/*<Link href="/creators" className={`hover:text-gray-300 transition-colors ${location.startsWith("/creators") ? "font-bold text-purple-400 border-b border-purple-400" : "text-gray-300"}`}>
+            Creators
+          </Link>*/}
         </div>
 
         {/* Mobile Menu Button */}
@@ -183,24 +184,31 @@ export default function Navbar() {
               >
                 Explore
               </Link>
-              <Link
-                href="/my-nfts"
-                className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location.startsWith("/my-nfts") ? "bg-purple-900 text-purple-300 font-bold" : ""}`}
+              {auth.currentUser ?
+                <Link
+                  href="/my-nfts"
+                  className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location.startsWith("/my-nfts") ? "bg-purple-900 text-purple-300 font-bold" : ""}`}
+                  onClick={closeSheet}
+                >
+                  My NFTs
+                </Link> : <></>
+              }
+              {/*<Link
+                href="/creators"
+                className={`px-2 py-1 rounded hover:bg-gray-800 transition-colors ${location.startsWith("/creators") ? "bg-purple-900 text-purple-300 font-bold" : ""}`}
                 onClick={closeSheet}
               >
-                My NFTs
-              </Link>
+                Creators
+              </Link>*/}
             </nav>
           </SheetContent>
         </Sheet>
       </div>
+      <p onClick={() => {
+        console.log(auth.currentUser, 'user');
+      }}>console</p>
 
       <div>
-        {/*<p onClick={() => {
-          console.log(user, 'user');
-          console.log(wallet, 'wallet');
-          console.log(isAuthenticated, 'isAuthenticated');
-        }}>kuda</p>*/}
         {!auth.currentUser && !isAuthenticated ? (
           <>
             <Button
@@ -319,7 +327,7 @@ function WalletDialogue({
   showWalletDetails,
   setShowWalletDetails,
   wallet
-}:{
+}: {
   showWalletDetails: boolean;
   setShowWalletDetails: (value: boolean) => void;
   wallet: any;
@@ -346,10 +354,11 @@ function WalletDialogue({
       const res = await fetch(`${BASE_URL}/api/wallet/balance/${wallet.publicKey}`);
       const { data } = await res.json();
       const resultBalance = data.balance;
+      console.log(data, 'data get ablance')
       setBalance(resultBalance || 0);
       toast({
         title: "Wallet balance fetched",
-        description: `Your wallet balance is ${balance} SOL`,
+        description: `Your wallet balance is ${resultBalance} SOL`,
       });
     }
   }

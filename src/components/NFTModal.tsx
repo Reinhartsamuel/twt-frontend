@@ -16,6 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 interface NFTModalProps {
   nft: NFT;
@@ -26,63 +27,10 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
   const [localNft, setLocalNft] = useState<NFT>(nft);
   const { toast } = useToast();
   const { wallet, isAuthenticated } = useAuthStore();
-  const queryClient = useQueryClient();
-
-  // Mutation for purchasing (on-chain minting) an NFT
-  const purchaseMutation = useMutation({
-    mutationFn: async () => {
-      if (!wallet) throw new Error("No wallet connected");
-      return apiRequest(`/api/nft/${nft.id}/purchase`,
-        JSON.stringify({
-          buyerWalletAddress: wallet.publicKey
-        }),
-        "POST"
-      );
-    },
-    onSuccess: (data) => {
-      // Update the local NFT state
-      setLocalNft({
-        ...localNft,
-        isMinted: 1,
-        walletAddress: wallet?.publicKey || localNft.walletAddress,
-        transactions: `Purchased and minted on-chain: ${new Date().toISOString().split("T")[0]}`
-      });
-
-      // Show success message
-      toast({
-        title: "Success!",
-        description: "The NFT has been purchased and minted on-chain",
-        variant: "default"
-      });
-
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ["nft", nft.id] });
-      queryClient.invalidateQueries({ queryKey: ["nfts"] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to purchase NFT: " + (error instanceof Error ? error.message : "Unknown error"),
-        variant: "destructive"
-      });
-    }
-  });
-
-  // Determine if this NFT is lazily minted (not yet on-chain)
-  const isLazyMinted = localNft.isMinted === 0;
 
   // Handle purchase button click
   const handlePurchase = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication required",
-        description: "Please connect your Twitter account and wallet before purchasing",
-        variant: "destructive"
-      });
-      return;
-    }
 
-    purchaseMutation.mutate();
   };
 
   return (
@@ -99,18 +47,6 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
               className="max-w-full max-h-[50vh] object-contain"
             />
           </div>
-
-          {/* Minting Status Badge */}
-          {isLazyMinted && (
-            <Badge className="absolute top-4 right-4 bg-yellow-600">
-              Lazy Minted
-            </Badge>
-          )}
-          {localNft.isMinted === 1 && (
-            <Badge className="absolute top-4 right-4 bg-green-600">
-              On-Chain
-            </Badge>
-          )}
         </div>
 
         {/* Right side - Info */}
@@ -122,11 +58,13 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
 
             <div className="flex justify-between items-center mt-1">
               <div className="flex items-center text-gray-400">
-                <span className="text-sm font-medium">{localNft.creatorTwitterHandle}</span>
+                <Link to={`/creator/${localNft.creatorTwitterHandle}`}>
+                  <span className="text-sm font-medium">{localNft.creatorTwitterHandle}</span>
+                </Link>
                 {/* Add a blue verification badge to simulate the verified creator */}
                 <span className="text-blue-500 ml-1">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
               </div>
@@ -155,23 +93,9 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
 
           {/* Buy now section */}
           <div className="mb-6 border-b border-gray-800 pb-6">
-            {/* Show minting info if lazy minted */}
-            {isLazyMinted && (
-              <div className="mb-3 bg-yellow-900/30 p-3 rounded-md">
-                <h4 className="text-sm font-semibold text-yellow-300 flex items-center gap-2">
-                  <ShoppingCart size={16} />
-                  Lazy Minted NFT
-                </h4>
-                <p className="text-xs text-gray-300 mt-1">
-                  This NFT is lazily minted and will be created on-chain when purchased.
-                  No gas fees have been paid yet, making it eco-friendly and cost-effective.
-                </p>
-              </div>
-            )}
-
             <div className="flex justify-between items-center mb-3">
               <div className="text-sm text-gray-400">
-                {isLazyMinted ? "Mint & Buy for" : "Buy for"}
+                Buy for
               </div>
               <div className="text-xs text-gray-500">Ending in 1 month</div>
             </div>
@@ -184,29 +108,9 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
             </div>
 
             <div className="flex gap-2">
-              {isLazyMinted ? (
-                <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={handlePurchase}
-                  disabled={purchaseMutation.isPending || !isAuthenticated}
-                >
-                  {purchaseMutation.isPending ? (
-                    <span className="flex items-center gap-2">
-                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                      Minting...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <ShoppingCart size={16} />
-                      Mint & Buy Now
-                    </span>
-                  )}
-                </Button>
-              ) : (
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                  Buy now
-                </Button>
-              )}
+              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                Buy now
+              </Button>
               <Button variant="outline" className="px-4">
                 Make offer
               </Button>
@@ -226,7 +130,7 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
                 <div className="flex items-center">
                   <div className="mr-3">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16m10-10 2-2m-2 2-2-2m-8 4 2-2m-2 2-2-2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16m10-10 2-2m-2 2-2-2m-8 4 2-2m-2 2-2-2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <div>
@@ -243,7 +147,7 @@ export default function NFTModal({ nft, isUserNFT = false }: NFTModalProps) {
                 <div className="flex items-center">
                   <div className="mr-3">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 12h12m-6-6v12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M6 12h12m-6-6v12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <div>

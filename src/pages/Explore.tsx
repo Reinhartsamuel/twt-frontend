@@ -33,24 +33,12 @@ export default function Explore() {
     setIsRefreshing(true);
     try {
       await queryClient.invalidateQueries({
-        queryKey: [`/api/explore?tab=${activeTab}&sort=${sortOrder}&creator=${creatorFilter}`]
+        queryKey: [`${BASE_URL}/api/explore?tab=${activeTab}`]
       });
     } finally {
       setTimeout(() => setIsRefreshing(false), 500);
     }
   };
-
-  const filteredNfts = nfts
-    ? nfts.filter((nft: any) => {
-      if (!searchTerm) return true;
-
-      const term = searchTerm.toLowerCase();
-      return (
-        nft.title.toLowerCase().includes(term) ||
-        nft.creator.toLowerCase().includes(term)
-      );
-    })
-    : [];
 
   return (
     <main className="flex-grow">

@@ -18,6 +18,7 @@ export interface NFT {
   isMinted?: number; // 0 = lazy minted, 1 = on-chain minted
   metadata?: any;
   creatorTwitterHandle: string;
+  walletAddress: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,7 +59,7 @@ export default function NFTCard({ nft, isUserNFT = false }: NFTCardProps) {
           <CardContent className="p-4">
             <h4 className="font-medium mb-1 truncate">{nft.metadata?.name}</h4>
             {isUserNFT ? (
-              <p className="text-sm text-gray-400">Minted on  {formatDistanceToNow(new Date(nft.updatedAt), { addSuffix: true })}</p>
+              <p className="text-sm text-gray-400">Minted {formatDistanceToNow(new Date(nft.updatedAt), { addSuffix: true })}</p>
             ) : (
               <div className="flex justify-between items-center">
                 <p className="text-sm text-gray-400">{nft.creatorTwitterHandle}</p>
