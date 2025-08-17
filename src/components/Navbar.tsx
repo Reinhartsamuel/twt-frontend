@@ -204,9 +204,9 @@ export default function Navbar() {
           </SheetContent>
         </Sheet>
       </div>
-      <p onClick={() => {
+      {/*<p onClick={() => {
         console.log(auth.currentUser, 'user');
-      }}>console</p>
+      }}>console</p>*/}
 
       <div>
         {!auth.currentUser && !isAuthenticated ? (
