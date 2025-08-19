@@ -45,7 +45,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui"
 import PhantomLogo from "@/assets/Phantom-Icon_App_60x60.png";
 import { BASE_URL } from "@/constants/baseUrl";
-
+const provider = new TwitterAuthProvider();
 
 
 export default function Navbar() {
@@ -111,6 +111,12 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
+    const provider = new TwitterAuthProvider();
+    // 👇 This passes `force_login=true` to Twitter's OAuth endpoint
+    provider.setCustomParameters({
+      force_login: 'true'
+    });
+
     await auth.signOut();
     logout();
     setShowLogoutConfirm(false);
